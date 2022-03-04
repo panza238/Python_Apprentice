@@ -13,6 +13,8 @@ class Flight(object):
             raise ValueError("Invalid route number '{}'".format(number))
         self._number = number
         self._aircraft = aircraft
+        rows, seats = self._aircraft.seating_plan()
+        self._seating = [None] + [{letter: None for letter in seats} for _ in rows]
 
     def number(self):
         return self._number
@@ -23,6 +25,40 @@ class Flight(object):
     def aircraft_model(self):
         # by doing this, the user only has to interact with ONE object, the flight object.
         return self._aircraft.model()
+
+    def allocate_seat(self, seat, passenger):
+        """Allocate a seat to a passenger.
+            Args:
+                seat: A seat designator such as '12C' or '21F'.
+                passenger: The passenger name.
+            Raises:
+                ValueError: If the seat is unavailable.
+        """
+        # row, letter checks
+        row, letter = self._parse_seat(seat)
+        # Check availability
+        if self._seating[row][letter] is not None:
+            raise ValueError("Seat {} already occupied".format(seat))
+        # Assign
+        self._seating[row][letter] = passenger
+
+    def _parse_seat(self, seat):
+        """Implementation detail"""
+        rows, seat_letters = self._aircraft.seating_plan()
+        letter = seat[-1]
+        if letter not in seat_letters:
+            raise ValueError("Invalid seat letter {}".format(letter))
+
+        row_text = seat[:-1]
+        try:
+            row = int(row_text)
+        except ValueError:
+            raise ValueError("Invalid seat row {}".format(row_text))
+
+        if row not in rows:
+            raise ValueError("Invalid row number {}".format(row))
+
+        return row, letter
 
 
 class Aircraft(object):
@@ -46,3 +82,14 @@ class Aircraft(object):
 
 a = Aircraft("G-EUPT", "Airbus A319", num_rows=22, num_seats_per_row=6)
 f = Flight("AA1425", a)
+
+
+def make_flight():
+    f = Flight("BA758", Aircraft("G-EUPT", "Airbus A319",
+                num_rows=22, num_seats_per_row=6))
+    f.allocate_seat('12A', 'Guido van Rossum')
+    f.allocate_seat('15F', 'Bjarne Stroustrup')
+    f.allocate_seat('15E', 'Anders Hejlsberg')
+    f.allocate_seat('1C', 'John McCarthy')
+    f.allocate_seat('1D', 'Richard Hickey')
+    return f
