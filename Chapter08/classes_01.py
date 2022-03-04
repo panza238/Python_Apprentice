@@ -79,9 +79,15 @@ class Aircraft(object):
         return (range(1, self._num_rows + 1),
                 "ABCDEFGHJK"[:self._num_seats_per_row])
 
+    def num_seats(self):
+        rows, row_seats = self.seating_plan()
+        return len(rows) * len(row_seats)
 
-a = Aircraft("G-EUPT", "Airbus A319", num_rows=22, num_seats_per_row=6)
-f = Flight("AA1425", a)
+
+class Airbus319(Aircraft):
+    """Airbus aircraft"""
+    def __init__(self, registration,):
+        super().__init__(registration, "Airbus A319", 22, 6)
 
 
 def make_flight():
@@ -94,4 +100,9 @@ def make_flight():
     f.allocate_seat('15E', 'Anders Hejlsberg')
     f.allocate_seat('1C', 'John McCarthy')
     f.allocate_seat('1D', 'Richard Hickey')
-    return f
+
+    g = Flight("AA217", Airbus319("G-PANZ"))
+    g.allocate_seat('1A', 'Panza')
+    g.allocate_seat('2A', 'Residente')
+
+    return f, g
