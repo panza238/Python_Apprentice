@@ -85,8 +85,10 @@ f = Flight("AA1425", a)
 
 
 def make_flight():
+    """So that I don't have to create the same element again and again.
+    Much more elegant solution than to just declare a and f"""
     f = Flight("BA758", Aircraft("G-EUPT", "Airbus A319",
-                num_rows=22, num_seats_per_row=6))
+                                 num_rows=22, num_seats_per_row=6))
     f.allocate_seat('12A', 'Guido van Rossum')
     f.allocate_seat('15F', 'Bjarne Stroustrup')
     f.allocate_seat('15E', 'Anders Hejlsberg')
